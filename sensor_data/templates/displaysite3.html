@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sensor Data</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function fetchData() {
+            $.ajax({
+                url: '/api/sensor-data/',  // Ensure this URL matches the Django URL configuration
+                type: 'GET',
+                success: function(data) {
+                    $('#humidity').text(data.humidity);
+                    $('#temperature').text(data.temperature);
+                    $('#moisture_value').text(data.moisture_value);
+                    $('#moisture_percentage').text(data.moisture_percentage);
+                },
+                error: function(error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            // Set an interval for fetching data every 5 seconds
+            var intervalId;
+
+            $('#startButton').click(function() {
+                // Start data collection
+                intervalId = setInterval(fetchData, 5000);
+            });
+
+            $('#stopButton').click(function() {
+                // Stop data collection
+                clearInterval(intervalId);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Sensor Data</h1>
+    <form id="startForm" action="/start/" method="post">
+        {% csrf_token %}
+        <button id="startButton" type="submit">Start Data Collection</button>
+    </form>
+    <form id="stopForm" action="/stop/" method="post">
+        {% csrf_token %}
+        <button id="stopButton" type="submit">Stop Data Collection</button>
+    </form>
+    <div>
+        <p>Humidity: <span id="humidity">Loading...</span>%</p>
+        <p>Temperature: <span id="temperature">Loading...</span>°C</p>
+        <p>Moisture Value: <span id="moisture_value">Loading...</span></p>
+        <p>Moisture Percentage: <span id="moisture_percentage">Loading...</span>%</p>
+    </div>
+</body>
+</html>

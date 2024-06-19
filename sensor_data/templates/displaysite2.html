@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Agriculture Monitoring System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 40px;
+        }
+        .sensor-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .sensor-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px;
+            text-align: center;
+            flex: 1 0 30%;
+        }
+        .sensor-box h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .sensor-box p {
+            font-size: 18px;
+            color: #777;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        /* Media Queries for Responsive Design */
+        @media only screen and (max-width: 768px) {
+            .sensor-box {
+                flex: 1 0 45%;
+            }
+        }
+
+        @media only screen and (max-width: 576px) {
+            .sensor-box {
+                flex: 1 0 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Sensor Data</h1>
+        <div class="button-container">
+            <form id="start-form" action="/start/" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Start Data Collection</button>
+            </form>
+            <form id="stop-form" action="/stop/" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Stop Data Collection</button>
+            </form>
+        </div>
+        <div class="sensor-container">
+            <div class="sensor-box" id="humidityBox">
+                <h2>Humidity</h2>
+                <p id="humidityValue"></p>
+            </div>
+            <div class="sensor-box" id="temperatureBox">
+                <h2>Temperature</h2>
+                <p id="temperatureValue"></p>
+            </div>
+            <div class="sensor-box" id="moistureValueBox">
+                <h2>Moisture Value</h2>
+                <p id="moistureValue"></p>
+            </div>
+            <div class="sensor-box" id="moisturePercentageBox">
+                <h2>Moisture Percentage</h2>
+                <p id="moisturePercentage"></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Mock sensor data
+        var data = [
+            { humidity: 50, temperature: 25, moisture_value: 35, moisture_percentage: 70 },
+            { humidity: 55, temperature: 26, moisture_value: 37, moisture_percentage: 72 },
+            { humidity: 52, temperature: 24, moisture_value: 36, moisture_percentage: 71 }
+            // Add more data as needed
+        ];
+
+        var index = 0;
+
+        function displaySensorData() {
+            var sensorData = data[index];
+            document.getElementById("humidityValue").textContent = sensorData.humidity + "%";
+            document.getElementById("temperatureValue").textContent = sensorData.temperature + "°C";
+            document.getElementById("moistureValue").textContent = sensorData.moisture_value;
+            document.getElementById("moisturePercentage").textContent = sensorData.moisture_percentage + "%";
+            
+            index = (index + 1) % data.length; // Increment index and loop back to start if end is reached
+        }
+
+        // Display initial sensor data
+        displaySensorData();
+
+        // Interval for switching sensor data every 1 second
+        setInterval(displaySensorData, 1000);
+    </script>
+</body>
+</html>

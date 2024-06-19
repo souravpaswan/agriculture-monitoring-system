@@ -1,0 +1,291 @@
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Agriculture Monitoring System</title>
+    <link rel="stylesheet" type="text/css" href="style.css"> <!-- Assuming CSS is externalized -->
+    <script>
+        var intervalID = null;
+
+        function startFetching() {
+            intervalID = setInterval(fetchData, 1000); // fetch data every second
+        }
+
+        function stopFetching() {
+            clearInterval(intervalID);
+        }
+
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/sensor-data/');
+                const data = await response.json();
+                updateUI(data);
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
+            }
+        }
+
+        function updateUI(data) {
+            document.getElementById('humidity').innerText = data.humidity + '%';
+            document.getElementById('temperature').innerText = data.temperature + '°C';
+            document.getElementById('moisture_value').innerText = data.moisture_value;
+            document.getElementById('moisture_percentage').innerText = data.moisture_percentage + '%';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Sensor Data</h1>
+        <div class="button-container">
+            <button onclick="startFetching()" class="btn btn-success">Start Data Collection</button>
+            <button onclick="stopFetching()" class="btn btn-danger">Stop Data Collection</button>
+        </div>
+        <div class="sensor-container">
+            <div class="sensor-box"><h2>Humidity</h2><p id="humidity">--</p></div>
+            <div class="sensor-box"><h2>Temperature</h2><p id="temperature">--</p></div>
+            <div class="sensor-box"><h2>Moisture Value</h2><p id="moisture_value">--</p></div>
+            <div class="sensor-box"><h2>Moisture Percentage</h2><p id="moisture_percentage">--</p></div>
+        </div>
+    </div>
+</body>
+</html> {% endcomment %}
+
+
+
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Data</title>
+</head>
+<body>
+    <h1>Arduino Sensor Data</h1>
+    <div id="dataDisplay">
+        Waiting for data...
+    </div>
+
+    <script>
+        function fetchData() {
+            fetch('/arduino/')
+                .then(response => response.json())
+                .then(data => {
+                    if(data.error) {
+                        console.error(data.error);
+                    } else {
+                        document.getElementById('dataDisplay').innerHTML = Moisture Value: ${data['Moisture Value']}, Temperature: ${data.Temperature}, Humidity: ${data.Humidity}, LED: ${data.LED};
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Poll the server every 5 seconds
+        setInterval(fetchData, 5000);
+    </script>
+</body>
+</html> {% endcomment %}
+
+
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <title>Sensor Data</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function fetchData() {
+            $.ajax({
+                url: '/api/sensor-data/',  // Ensure this URL matches the Django URL configuration
+                type: 'GET',
+                success: function(data) {
+                    $('#humidity').text(data.humidity);
+                    $('#temperature').text(data.temperature);
+                    $('#moisture_value').text(data.moisture_value);
+                    $('#moisture_percentage').text(data.moisture_percentage);
+                },
+                error: function(error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            // Fetch the data for the first time
+            fetchData();
+
+            // Set an interval for fetching data every 5 seconds
+            setInterval(fetchData, 5000);
+        });
+    </script>
+</head>
+<body>
+    <h1>Sensor Data</h1>
+    <form action="/start/" method="post">
+        {% csrf_token %}
+        <button type="submit">Start Data Collection</button>
+    </form>
+    <form action="/stop/" method="post">
+        {% csrf_token %}
+        <button type="submit">Stop Data Collection</button>
+    </form>
+    <div>
+        <p>Humidity: <span id="humidity">Loading...</span>%</p>
+        <p>Temperature: <span id="temperature">Loading...</span>°C</p>
+        <p>Moisture Value: <span id="moisture_value">Loading...</span></p>
+        <p>Moisture Percentage: <span id="moisture_percentage">Loading...</span>%</p>
+    </div>
+</body>
+</html> {% endcomment %} 
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Agriculture Monitoring System</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 40px;
+        }
+        .sensor-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .sensor-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px;
+            text-align: center;
+            flex: 1 0 30%;
+        }
+        .sensor-box h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .sensor-box p {
+            font-size: 18px;
+            color: #777;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Sensor Data</h1>
+        <div class="button-container">
+            <form id="start-form" action="/start/" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success" id='start_button'>Start Data Collection</button>
+            </form>
+            <form id="stop-form" action="/stop/" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" id='end_button'>Stop Data Collection</button>
+            </form>
+        </div>
+        
+        <div class="sensor-container">
+            <div class="sensor-box">
+                <h2>Humidity</h2>
+                <p><span id="humidity">Loading...</span>%</p>
+            </div>
+            <div class="sensor-box">
+                <h2>Temperature</h2>
+                <p><span id="temperature">Loading...</span>°C</p>
+            </div>
+            <div class="sensor-box">
+                <h2>Moisture Value</h2>
+                <p><span id="moisture_value">Loading...</span></p>
+            </div>
+            <div class="sensor-box">
+                <h2>Moisture Percentage</h2>
+                <p><span id="moisture_percentage">Loading...</span>%</p>
+            </div>
+            <div class="sensor-box">
+                <h2>Motor Status</h2>
+                <p><span id="motor_status">Loading...</span></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        
+        function fetchData() {
+            let showStart = false;
+            
+            $.ajax({
+                url: '/api/sensor-data/',  // Ensure this URL matches the Django URL configuration
+                type: 'GET',
+                success: function(data) {
+                    $('#humidity').text(data.humidity);
+                    $('#temperature').text(data.temperature);
+                    $('#moisture_value').text(data.moisture_value);
+                    $('#moisture_percentage').text(data.moisture_percentage);
+                    $('#motor_status').text(data.motor_status);
+
+                },
+                error: function(error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            // Fetch the data for the first time
+            fetchData();
+            // Set an interval for fetching data every 5 seconds
+           setInterval(fetchData, 5000); 
+
+        });
+        
+    </script>
+</body>
+</html>
